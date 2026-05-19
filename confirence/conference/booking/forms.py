@@ -314,6 +314,34 @@ class BookingRequestForm(forms.ModelForm):
         
         return cleaned_data
 
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['text', 'rating']
+
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 4,
+                'placeholder': 'Напишите отзыв о мероприятии'
+            }),
+            'rating': forms.Select(
+                attrs={'class': 'form-input'},
+                choices=[
+                    (5, '5 — отлично'),
+                    (4, '4 — хорошо'),
+                    (3, '3 — нормально'),
+                    (2, '2 — плохо'),
+                    (1, '1 — очень плохо'),
+                ]
+            ),
+        }
+
+        labels = {
+            'text': 'Отзыв',
+            'rating': 'Оценка',
+        }
+        
 
 class AdminStatusForm(forms.ModelForm):
     class Meta:
