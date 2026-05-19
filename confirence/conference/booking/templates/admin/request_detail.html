@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Заявка №{{ booking_request.id }} — Конференц.NET{% endblock %}
+{% block title %}Заявка №{{ booking_request.id }} {% endblock %}
 
 {% block content %}
 
@@ -37,6 +37,11 @@
             <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
                 <div class="text-sm text-slate-500 mb-1">Дата мероприятия</div>
                 <div class="text-xl font-bold text-slate-900">{{ booking_request.event_date|date:"d.m.Y" }}</div>
+            </div>
+
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                <div class="text-sm text-slate-500 mb-1">Время начала</div>
+                <div class="text-xl font-bold text-slate-900">{{ booking_request.conference_start|date:"H:i" }}</div>
             </div>
 
             <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">

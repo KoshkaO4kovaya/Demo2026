@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Панель администратора — Конференц.NET{% endblock %}
+{% block title %}Панель администратора{% endblock %}
 
 {% block content %}
 
@@ -106,7 +106,7 @@
 
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-                    <div class="grid sm:grid-cols-5 gap-3 flex-1">
+                    <div class="grid sm:grid-cols-6 gap-3 flex-1">
 
                         <div>
                             <div class="text-xs text-slate-500">Заявка</div>
@@ -133,6 +133,13 @@
                             <div class="text-xs text-slate-500">Дата</div>
                             <div class="font-semibold text-slate-900">
                                 {{ item.event_date|date:"d.m.Y" }}
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="text-xs text-slate-500">Время</div>
+                            <div class="font-semibold text-slate-900">
+                                {{ item.conference_start|date:"H:i" }}
                             </div>
                         </div>
 

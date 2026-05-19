@@ -3,6 +3,7 @@ import re
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
+from datetime import datetime, time
 
 from .models import BookingRequest, Profile, Review, Room
 
@@ -163,33 +164,155 @@ class BookingRequestForm(forms.ModelForm):
             self.fields['room'].initial = selected_room
             self.fields['room'].disabled = True
 
-class ReviewForm(forms.ModelForm):
+            
+class BookingRequestForm(forms.ModelForm):
+    event_date = forms.DateField(
+        label='Дата проведения',
+        input_formats=['%Y-%m-%d', '%d.%m.%Y'],
+        widget=forms.DateInput(attrs={
+            'class': 'form-input pr-12 custom-date-input',
+            'type': 'date',
+            'autocomplete': 'off',
+        })
+    )
+
+    start_time = forms.TimeField(
+        label='Время начала',
+        required=True,
+        widget=forms.TimeInput(attrs={
+            'class': 'form-input',
+            'type': 'time',
+            'step': '900',
+        })
+    )
+
     class Meta:
-        model = Review
-        fields = ['text', 'rating']
+        model = BookingRequest
+        fields = ['room', 'event_date', 'payment_method', 'comment']
 
         widgets = {
-            'text': forms.Textarea(attrs={
+            'room': forms.Select(attrs={
+                'class': 'form-input'
+            }),
+            'payment_method': forms.Select(attrs={
+                'class': 'form-input'
+            }),
+            'comment': forms.Textarea(attrs={
                 'class': 'form-input',
                 'rows': 4,
-                'placeholder': 'Напишите отзыв о мероприятии'
+                'placeholder': 'Комментарий к заявке, если требуется'
             }),
-            'rating': forms.Select(
-                attrs={'class': 'form-input'},
-                choices=[
-                    (5, '5 — отлично'),
-                    (4, '4 — хорошо'),
-                    (3, '3 — нормально'),
-                    (2, '2 — плохо'),
-                    (1, '1 — очень плохо'),
-                ]
-            ),
         }
 
         labels = {
-            'text': 'Отзыв',
-            'rating': 'Оценка',
+            'room': 'Помещение',
+            'payment_method': 'Способ оплаты',
+            'comment': 'Комментарий',
         }
+
+    def __init__(self, *args, **kwargs):
+        selected_room = kwargs.pop('selected_room', None)
+        super().__init__(*args, **kwargs)
+
+        self.fields['room'].queryset = Room.objects.filter(is_active=True)
+
+        if selected_room:
+            self.fields['room'].initial = selected_room
+            self.fields['room'].disabled = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        event_date = cleaned_data.get('event_date')
+        start_time = cleaned_data.get('start_time')
+        
+        if event_date and start_time:
+            from django.utils import timezone
+            from datetime import datetime
+            naive_datetime = datetime.combine(event_date, start_time)
+            conference_start = timezone.make_aware(naive_datetime)
+            self.instance.conference_start = conference_start
+        
+        return cleaned_data
+    
+
+class BookingRequestForm(forms.ModelForm):
+    event_date = forms.DateField(
+        label='Дата проведения',
+        input_formats=['%Y-%m-%d', '%d.%m.%Y'],
+        widget=forms.DateInput(attrs={
+            'class': 'form-input pr-12 custom-date-input',
+            'type': 'date',
+            'autocomplete': 'off',
+        })
+    )
+
+    start_time = forms.TimeField(
+        label='Время начала',
+        required=True,
+        widget=forms.TimeInput(attrs={
+            'class': 'form-input',
+            'type': 'time',
+            'step': '900',
+        })
+    )
+
+    class Meta:
+        model = BookingRequest
+        fields = ['room', 'event_date', 'payment_method', 'comment']
+
+        widgets = {
+            'room': forms.Select(attrs={
+                'class': 'form-input'
+            }),
+            'payment_method': forms.Select(attrs={
+                'class': 'form-input'
+            }),
+            'comment': forms.Textarea(attrs={
+                'class': 'form-input',
+                'rows': 4,
+                'placeholder': 'Комментарий к заявке, если требуется'
+            }),
+        }
+
+        labels = {
+            'room': 'Помещение',
+            'payment_method': 'Способ оплаты',
+            'comment': 'Комментарий',
+        }
+
+    def __init__(self, *args, **kwargs):
+        selected_room = kwargs.pop('selected_room', None)
+        super().__init__(*args, **kwargs)
+
+        self.fields['room'].queryset = Room.objects.filter(is_active=True)
+
+        if selected_room:
+            self.fields['room'].initial = selected_room
+            self.fields['room'].disabled = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        event_date = cleaned_data.get('event_date')
+        start_time = cleaned_data.get('start_time')
+        
+        if event_date and start_time:
+            from django.utils import timezone
+            from datetime import datetime, date
+            
+            naive_datetime = datetime.combine(event_date, start_time)
+            conference_start = timezone.make_aware(naive_datetime)
+            self.instance.conference_start = conference_start
+            
+            now = timezone.now()
+            today = now.date()
+            
+            if event_date < today:
+                raise forms.ValidationError('Нельзя выбрать дату в прошлом.')
+            
+            if event_date == today and start_time <= now.time():
+                raise forms.ValidationError(f'Нельзя выбрать время в прошлом. Текущее время: {now.strftime("%H:%M")}')
+        
+        return cleaned_data
 
 
 class AdminStatusForm(forms.ModelForm):
@@ -206,6 +329,7 @@ class AdminStatusForm(forms.ModelForm):
         labels = {
             'status': 'Статус заявки'
         }
+
 
 class RoomForm(forms.ModelForm):
     class Meta:
@@ -238,3 +362,4 @@ class RoomForm(forms.ModelForm):
             'description': 'Описание',
             'is_active': 'Доступен для бронирования',
         }
+

@@ -17,7 +17,7 @@
             </h1>
 
             <p class="text-slate-500 mt-2">
-                Укажите помещение, дату проведения конференции и способ оплаты
+                Укажите помещение, дату и время проведения конференции
             </p>
         </div>
 
@@ -38,30 +38,51 @@
                 {% endif %}
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold mb-2">
-                    Дата проведения
-                </label>
+            <!-- БЛОК ДАТЫ И ВРЕМЕНИ В ДВЕ КОЛОНКИ -->
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-2">
+                        Дата проведения
+                    </label>
 
-                <div class="relative">
-                    {{ form.event_date }}
+                    <div class="relative">
+                        {{ form.event_date }}
 
-                    <button type="button"
-                            id="openDatePicker"
-                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main transition">
-                        <i class="fa-solid fa-calendar-days"></i>
-                    </button>
+                        <button type="button"
+                                id="openDatePicker"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main transition">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </button>
+                    </div>
+
+                    {% if form.event_date.errors %}
+                        <p class="text-red-600 text-sm mt-1">
+                            {{ form.event_date.errors.0 }}
+                        </p>
+                    {% endif %}
+
+                    <p class="text-xs text-slate-400 mt-1">
+                        Выберите дату
+                    </p>
                 </div>
 
-                {% if form.event_date.errors %}
-                    <p class="text-red-600 text-sm mt-1">
-                        {{ form.event_date.errors.0 }}
-                    </p>
-                {% endif %}
+                <div>
+                    <label class="block text-sm font-semibold mb-2">
+                        Время начала
+                    </label>
 
-                <p class="text-xs text-slate-400 mt-1">
-                    Выберите дату проведения мероприятия
-                </p>
+                    {{ form.start_time }}
+
+                    {% if form.start_time.errors %}
+                        <p class="text-red-600 text-sm mt-1">
+                            {{ form.start_time.errors.0 }}
+                        </p>
+                    {% endif %}
+
+                    <p class="text-xs text-slate-400 mt-1">
+                        Выберите время (с 9:00 до 22:00)
+                    </p>
+                </div>
             </div>
 
             <div>
@@ -92,6 +113,15 @@
                 {% endif %}
             </div>
 
+            <!-- Общие ошибки формы -->
+            {% if form.non_field_errors %}
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-4">
+                    {% for error in form.non_field_errors %}
+                        <p class="text-red-600 text-sm">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <div class="flex flex-col sm:flex-row gap-3">
                 <button type="submit"
                         class="soft-hover w-full py-3 rounded-2xl bg-main text-white font-semibold shadow hover:bg-[#117127] transition">
@@ -107,7 +137,6 @@
 
     </div>
 </div>
-
 
 <style>
     .custom-date-input::-webkit-calendar-picker-indicator {
@@ -134,6 +163,12 @@
                 dateInput.focus();
             }
         });
+    }
+
+    const timeInput = document.querySelector('input[name="start_time"]');
+    if (timeInput) {
+        timeInput.setAttribute('min', '09:00');
+        timeInput.setAttribute('max', '22:00');
     }
 </script>
 
