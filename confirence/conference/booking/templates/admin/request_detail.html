@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Заявка №{{ booking_request.id }} — Конференц.NET{% endblock %}
+
+{% block content %}
+
+<section class="fade-up bg-white rounded-[28px] shadow-sm border border-slate-200 overflow-hidden">
+
+    <div class="bg-slate-900 text-white p-6 md:p-8">
+        <a href="{% url 'admin_panel' %}" class="inline-flex items-center gap-2 text-slate-300 hover:text-white mb-5">
+            <i class="fa-solid fa-arrow-left"></i>
+            Назад в админ-панель
+        </a>
+
+        <h1 class="text-3xl md:text-4xl font-bold">
+            Заявка №{{ booking_request.id }}
+        </h1>
+
+        <p class="text-slate-300 mt-2">
+            Просмотр заявки и изменение статуса
+        </p>
+    </div>
+
+    <div class="p-6 md:p-8">
+
+        <div class="grid md:grid-cols-2 gap-5 mb-8">
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                <div class="text-sm text-slate-500 mb-1">Пользователь</div>
+                <div class="text-xl font-bold text-slate-900">{{ booking_request.user.username }}</div>
+            </div>
+
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                <div class="text-sm text-slate-500 mb-1">Помещение</div>
+                <div class="text-xl font-bold text-slate-900">{{ booking_request.room.name }}</div>
+            </div>
+
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                <div class="text-sm text-slate-500 mb-1">Дата мероприятия</div>
+                <div class="text-xl font-bold text-slate-900">{{ booking_request.event_date|date:"d.m.Y" }}</div>
+            </div>
+
+            <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5">
+                <div class="text-sm text-slate-500 mb-1">Способ оплаты</div>
+                <div class="text-xl font-bold text-slate-900">{{ booking_request.get_payment_method_display }}</div>
+            </div>
+        </div>
+
+        <div class="rounded-3xl bg-slate-50 border border-slate-200 p-5 mb-8">
+            <div class="text-sm text-slate-500 mb-2">Комментарий</div>
+            <div class="text-slate-800">
+                {{ booking_request.comment|default:"Комментарий отсутствует" }}
+            </div>
+        </div>
+
+        <div class="rounded-3xl border border-slate-200 p-5">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-5">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">
+                        Статус заявки
+                    </h2>
+                    <p class="text-slate-500 mt-1">
+                        Выберите новый статус заявки
+                    </p>
+                </div>
+
+                <span class="px-3 py-1 rounded-full text-xs font-semibold
+                    {% if booking_request.status == 'new' %}
+                        bg-blue-100 text-blue-700
+                    {% elif booking_request.status == 'assigned' %}
+                        bg-yellow-100 text-yellow-700
+                    {% elif booking_request.status == 'completed' %}
+                        bg-green-100 text-green-700
+                    {% else %}
+                        bg-red-100 text-red-700
+                    {% endif %}">
+                    {{ booking_request.get_status_display }}
+                </span>
+            </div>
+
+            <form method="post"
+                  action="{% url 'admin_change_status' booking_request.id %}"
+                  class="grid md:grid-cols-[1fr_auto] gap-3 items-end">
+                {% csrf_token %}
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Новый статус</label>
+
+                    <select name="status" class="form-input">
+                        <option value="new" {% if booking_request.status == 'new' %}selected{% endif %}>Новая</option>
+                        <option value="assigned" {% if booking_request.status == 'assigned' %}selected{% endif %}>Мероприятие назначено</option>
+                        <option value="completed" {% if booking_request.status == 'completed' %}selected{% endif %}>Мероприятие завершено</option>
+                        <option value="rejected" {% if booking_request.status == 'rejected' %}selected{% endif %}>Отклонена</option>
+                    </select>
+                </div>
+
+                <button type="submit"
+                        class="px-6 py-3 rounded-2xl bg-main text-white font-semibold shadow hover:bg-[#117127] transition">
+                    Сохранить
+                </button>
+            </form>
+        </div>
+
+        {% if booking_request.review %}
+            <div class="mt-8 rounded-3xl border border-green-200 bg-green-50 p-6">
+                <h3 class="text-xl font-bold text-green-700 mb-2">
+                    Отзыв пользователя
+                </h3>
+
+                <div class="text-green-700 mb-2">
+                    Оценка: {{ booking_request.review.rating }}/5
+                </div>
+
+                <p class="text-green-800">
+                    {{ booking_request.review.text }}
+                </p>
+            </div>
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Создание заявки — Конференц.NET{% endblock %}
+
+{% block content %}
+
+<div class="min-h-[70vh] flex items-center justify-center">
+    <div class="fade-up w-full max-w-2xl bg-white rounded-[28px] shadow-xl border border-slate-200 p-6 md:p-8">
+
+        <div class="mb-7">
+            <div class="w-14 h-14 rounded-2xl bg-blue-100 text-main flex items-center justify-center mb-4">
+                <i class="fa-solid fa-file-circle-plus text-2xl"></i>
+            </div>
+
+            <h1 class="text-3xl font-bold text-slate-900">
+                Создание заявки
+            </h1>
+
+            <p class="text-slate-500 mt-2">
+                Укажите помещение, дату проведения конференции и способ оплаты
+            </p>
+        </div>
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">
+                    Помещение
+                </label>
+
+                {{ form.room }}
+
+                {% if form.room.errors %}
+                    <p class="text-red-600 text-sm mt-1">
+                        {{ form.room.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">
+                    Дата проведения
+                </label>
+
+                <div class="relative">
+                    {{ form.event_date }}
+
+                    <button type="button"
+                            id="openDatePicker"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main transition">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </button>
+                </div>
+
+                {% if form.event_date.errors %}
+                    <p class="text-red-600 text-sm mt-1">
+                        {{ form.event_date.errors.0 }}
+                    </p>
+                {% endif %}
+
+                <p class="text-xs text-slate-400 mt-1">
+                    Выберите дату проведения мероприятия
+                </p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">
+                    Способ оплаты
+                </label>
+
+                {{ form.payment_method }}
+
+                {% if form.payment_method.errors %}
+                    <p class="text-red-600 text-sm mt-1">
+                        {{ form.payment_method.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">
+                    Комментарий
+                </label>
+
+                {{ form.comment }}
+
+                {% if form.comment.errors %}
+                    <p class="text-red-600 text-sm mt-1">
+                        {{ form.comment.errors.0 }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button type="submit"
+                        class="soft-hover w-full py-3 rounded-2xl bg-main text-white font-semibold shadow hover:bg-[#117127] transition">
+                    Отправить заявку
+                </button>
+
+                <a href="{% url 'room_list' %}"
+                   class="w-full text-center py-3 rounded-2xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition">
+                    Назад
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+<style>
+    .custom-date-input::-webkit-calendar-picker-indicator {
+        opacity: 0;
+        display: none;
+        -webkit-appearance: none;
+    }
+
+    .custom-date-input {
+        appearance: none;
+        -webkit-appearance: none;
+    }
+</style>
+
+<script>
+    const dateInput = document.querySelector('input[name="event_date"]');
+    const openDatePicker = document.getElementById('openDatePicker');
+
+    if (dateInput && openDatePicker) {
+        openDatePicker.addEventListener('click', function () {
+            if (dateInput.showPicker) {
+                dateInput.showPicker();
+            } else {
+                dateInput.focus();
+            }
+        });
+    }
+</script>
+
+{% endblock %}
