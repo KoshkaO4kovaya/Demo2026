@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход {% endblock %}
+
+{% block content %}
+
+<div class="min-h-[70vh] flex items-center justify-center">
+    <div class="fade-up w-full max-w-md bg-white rounded-[28px] shadow-xl border border-slate-200 p-6 md:p-8">
+
+        <div class="text-center mb-7">
+            <div class="mx-auto w-14 h-14 rounded-2xl bg-gray-100 text-main flex items-center justify-center mb-4">
+                <i class="fa-solid fa-right-to-bracket text-2xl"></i>
+            </div>
+
+            <h1 class="text-3xl font-bold text-slate-900">
+                Авторизация
+            </h1>
+
+            <p class="text-slate-500 mt-2">
+                Войдите в личный кабинет
+            </p>
+        </div>
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="rounded-2xl bg-red-50 border border-red-200 text-red-700 px-4 py-3 text-sm">
+                    Неверный логин или пароль.
+                </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Логин</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Пароль</label>
+                <div class="relative">
+                    {{ form.password }}
+                    <button type="button"
+                            class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.password.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit"
+                    class="soft-hover w-full py-3 rounded-2xl bg-main text-white font-semibold shadow hover:bg-[#117127] transition">
+                Войти
+            </button>
+        </form>
+        <div class="text-center mt-6 text-sm text-slate-600">
+            Еще не зарегистрированы?
+            <a href="{% url 'register' %}" class="text-main font-semibold hover:underline">
+                Регистрация
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

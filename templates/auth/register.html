@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация {% endblock %}
+
+{% block content %}
+
+<div class="min-h-[70vh] flex items-center justify-center">
+    <div class="fade-up w-full max-w-xl bg-white rounded-[28px] shadow-xl border border-slate-200 p-6 md:p-8">
+
+        <div class="text-center mb-7">
+            <div class="mx-auto w-14 h-14 rounded-2xl bg-gray-100 text-main flex items-center justify-center mb-4">
+                <i class="fa-solid fa-user-plus text-2xl"></i>
+            </div>
+
+            <h1 class="text-3xl font-bold text-slate-900">
+                Регистрация
+            </h1>
+
+            <p class="text-slate-500 mt-2">
+                Создайте аккаунт для оформления заявок
+            </p>
+        </div>
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Логин</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-slate-400 mt-1">Латиница и цифры, минимум 6 символов</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Пароль</label>
+                <div class="relative">
+                    {{ form.password }}
+                    <button type="button"
+                            class="toggle-password absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-main">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                {% if form.password.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.password.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-slate-400 mt-1">Минимум 8 символов</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">ФИО</label>
+                {{ form.full_name }}
+                {% if form.full_name.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.full_name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Телефон</label>
+
+                <div class="relative">
+                    {{ form.phone }}
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                        <i class="fa-solid fa-phone"></i>
+                    </div>
+                </div>
+
+                {% if form.phone.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.phone.errors.0 }}</p>
+                {% endif %}
+                <p class="text-xs text-slate-400 mt-1">Формат: 8(999)123-45-67</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Электронная почта</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit"
+                    class="soft-hover w-full py-3 rounded-2xl bg-main text-white font-semibold shadow hover:bg-[#117127] transition">
+                Создать пользователя
+            </button>
+        </form>
+
+        <div class="text-center mt-6 text-sm text-slate-600">
+            Уже есть аккаунт?
+            <a href="{% url 'login' %}" class="text-main font-semibold hover:underline">
+                Войти
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    const phoneInput = document.querySelector('input[name="phone"]');
+
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function () {
+            let numbers = phoneInput.value.replace(/\D/g, '');
+
+            if (numbers.startsWith('7')) {
+                numbers = '8' + numbers.slice(1);
+            }
+
+            if (!numbers.startsWith('8')) {
+                numbers = '8' + numbers;
+            }
+
+            numbers = numbers.slice(0, 11);
+
+            let result = '8';
+
+            if (numbers.length > 1) {
+                result += '(' + numbers.slice(1, 4);
+            }
+
+            if (numbers.length >= 4) {
+                result += ')';
+            }
+
+            if (numbers.length > 4) {
+                result += numbers.slice(4, 7);
+            }
+
+            if (numbers.length > 7) {
+                result += '-' + numbers.slice(7, 9);
+            }
+
+            if (numbers.length > 9) {
+                result += '-' + numbers.slice(9, 11);
+            }
+
+            phoneInput.value = result;
+        });
+
+        phoneInput.addEventListener('focus', function () {
+            if (phoneInput.value.trim() === '') {
+                phoneInput.value = '8(';
+            }
+        });
+
+        phoneInput.addEventListener('blur', function () {
+            if (phoneInput.value === '8(' || phoneInput.value === '8') {
+                phoneInput.value = '';
+            }
+        });
+    }
+</script>
+
+{% endblock %}

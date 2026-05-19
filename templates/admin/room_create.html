@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить зал — Конференц.NET{% endblock %}
+
+{% block content %}
+
+<div class="min-h-[70vh] flex items-center justify-center">
+    <div class="fade-up w-full max-w-2xl bg-white rounded-[28px] shadow-xl border border-slate-200 p-6 md:p-8">
+
+        <div class="mb-7">
+
+
+            <h1 class="text-3xl font-bold text-slate-900">
+                Добавить зал
+            </h1>
+
+            <p class="text-slate-500 mt-2">
+                Создайте новое помещение для бронирования
+            </p>
+        </div>
+
+        <form method="post" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Название зала</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Вместимость</label>
+                {{ form.capacity }}
+                {% if form.capacity.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.capacity.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold mb-2">Описание</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="text-red-600 text-sm mt-1">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+
+            <div class="flex flex-col sm:flex-row gap-3">
+                <button type="submit"
+                        class="soft-hover w-full py-3 rounded-2xl bg-main text-white font-semibold shadow hover:bg-[#117127] transition">
+                    Сохранить зал
+                </button>
+
+                <a href="{% url 'admin_panel' %}"
+                   class="w-full text-center py-3 rounded-2xl bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition">
+                    Назад
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

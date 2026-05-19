@@ -1,0 +1,213 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Конференции.РФ{% endblock %}</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        main: '#28A745',
+                        dark: '#343A40'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        .form-input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 14px;
+            padding: 12px 14px;
+            outline: none;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        .fade-up {
+            animation: fadeUp 0.35s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .soft-hover {
+            transition: 0.2s ease;
+        }
+
+        .soft-hover:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-[#CED4DA] text-slate-800">
+
+    
+<header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+
+        <a href="{% url 'home' %}" class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-main text-white flex items-center justify-center shadow">
+                <i class="fa-solid fa-building"></i>
+            </div>
+
+            <div>
+                <div class="font-bold text-lg leading-5">Конференции.РФ</div>
+                <div class="text-xs text-slate-500">бронирование помещений</div>
+            </div>
+        </a>
+
+        <nav class="hidden md:flex items-center gap-5 text-sm font-medium">
+
+            <a href="{% url 'home' %}" class="hover:text-main">Главная</a>
+            <a href="{% url 'room_list' %}" class="hover:text-main">Залы</a>
+            <a href="{% url 'review_list' %}" class="hover:text-main">Отзывы</a>
+            
+            {% if user.is_authenticated %}
+
+                {% if user.is_superuser or user.username == 'Admin26' %}
+                    <a href="{% url 'admin_panel' %}" class="hover:text-main">Админка</a>
+                    <a href="{% url 'admin_room_create' %}" class="hover:text-main">Добавить зал</a>
+                {% else %}
+                    <a href="{% url 'profile' %}" class="hover:text-main">Профиль</a>
+                    <a href="{% url 'create_request' %}" class="hover:text-main">Создать заявку</a>
+                {% endif %}
+
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-700 transition">
+                        Выйти
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a href="{% url 'login' %}" class="hover:text-main">Вход</a>
+                <a href="{% url 'register' %}"
+                   class="px-4 py-2 rounded-xl bg-main text-white hover:bg-[#117127] transition">
+                    Регистрация
+                </a>
+
+            {% endif %}
+        </nav>
+
+        <button id="mobileMenuBtn" class="md:hidden text-2xl">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <div id="mobileMenu" class="hidden md:hidden border-t border-slate-200 bg-white px-4 py-4">
+        <div class="flex flex-col gap-3 text-sm font-medium">
+
+            <a href="{% url 'home' %}" class="hover:text-main">Главная</a>
+            <a href="{% url 'room_list' %}" class="hover:text-main">Залы</a>
+            <a href="{% url 'review_list' %}" class="hover:text-main">Отзывы</a>
+
+            {% if user.is_authenticated %}
+
+                {% if user.is_superuser or user.username == 'Admin26' %}
+                    <a href="{% url 'admin_panel' %}" class="hover:text-main">Админка</a>
+                {% else %}
+                    <a href="{% url 'profile' %}" class="hover:text-main">Профиль</a>
+                {% endif %}
+
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="w-full text-left px-4 py-2 rounded-xl bg-slate-900 text-white">
+                        Выйти
+                    </button>
+                </form>
+
+            {% else %}
+
+                <a href="{% url 'login' %}" class="hover:text-main">Вход</a>
+                <a href="{% url 'register' %}" class="hover:text-main">Регистрация</a>
+
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+{% if messages %}
+    <div class="max-w-6xl mx-auto px-4 mt-5 space-y-3">
+        {% for message in messages %}
+            <div class="fade-up rounded-2xl px-4 py-3 shadow-sm border
+                {% if message.tags == 'success' %}
+                    bg-green-50 border-green-200 text-green-700
+                {% elif message.tags == 'error' %}
+                    bg-red-50 border-red-200 text-red-700
+                {% else %}
+                    bg-blue-50 border-blue-200 text-blue-700
+                {% endif %}">
+                <i class="fa-solid fa-circle-info mr-2"></i>
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="mt-10 py-6 text-center text-sm text-slate-500">
+    © 2026 Конференции.РФ | Абдуллина Аделя | ИС-222б
+</footer>
+
+<script>
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', function () {
+            mobileMenu.classList.toggle('hidden');
+        });
+    }
+
+    document.querySelectorAll('.toggle-password').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const input = this.parentElement.querySelector('input');
+            const icon = this.querySelector('i');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

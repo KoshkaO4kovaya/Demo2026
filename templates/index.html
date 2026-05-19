@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+
+<section class="fade-up overflow-hidden rounded-[32px] border border-blue-100 bg-white shadow-sm">
+
+    <div class="px-6 py-10 md:px-10 md:py-14 text-center">
+
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-[#28A745] text-sm font-semibold shadow-sm border border-blue-100 mb-6">
+            <i class="fa-solid fa-building-circle-check"></i>
+            Сервис бронирования помещений
+        </div>
+
+        <h1 class="text-3xl md:text-6xl font-extrabold text-slate-900 mb-5 tracking-tight">
+            Конференции<span class="text-[#28A745]">.РФ</span>
+        </h1>
+
+        <p class="max-w-2xl mx-auto text-lg md:text-xl text-slate-600 mb-8 leading-relaxed">
+            Выберите помещение, укажите дату конференции и отправьте заявку администратору.
+        </p>
+
+        <div class="flex flex-col sm:flex-row justify-center gap-4">
+            {% if user.is_authenticated %}
+                {% if user.is_superuser or user.username == 'Admin26' %}
+                    <a href="{% url 'admin_panel' %}"
+                       class="soft-hover px-7 py-3.5 rounded-2xl bg-[#28A745] text-white text-center font-semibold shadow hover:bg-[#117127] transition">
+                        <i class="fa-solid fa-user-shield mr-2"></i>
+                        Админ-панель
+                    </a>
+                {% else %}
+                    <a href="{% url 'profile' %}"
+                       class="soft-hover px-7 py-3.5 rounded-2xl bg-[#28A745] text-white text-center font-semibold shadow hover:bg-[#117127] transition">
+                        <i class="fa-solid fa-user mr-2"></i>
+                        Личный кабинет
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{% url 'register' %}"
+                   class="soft-hover px-7 py-3.5 rounded-2xl bg-[#28A745] text-white text-center font-semibold shadow hover:bg-[#117127] transition">
+                    <i class="fa-solid fa-user-plus mr-2"></i>
+                    Зарегистрироваться
+                </a>
+
+                <a href="{% url 'login' %}"
+                   class="soft-hover px-7 py-3.5 rounded-2xl bg-white text-slate-800 text-center font-semibold shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                    <i class="fa-solid fa-right-to-bracket mr-2"></i>
+                    Войти
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+</section>
+
+<section class="fade-up mt-8 bg-white rounded-[32px] shadow-sm border border-slate-200 p-4">
+
+    <div class="relative h-[250px] md:h-[400px] rounded-[26px] overflow-hidden bg-slate-100">
+
+        <img src="{% static 'images/slide1.jpg' %}"
+             class="slider-image absolute inset-0 w-full h-full object-cover opacity-100 transition-opacity duration-700"
+             alt="Конференц-зал">
+
+        <img src="{% static 'images/slide2.jpg' %}"
+             class="slider-image absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700"
+             alt="Зал для мероприятия">
+
+        <img src="{% static 'images/slide3.jpg' %}"
+             class="slider-image absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700"
+             alt="Деловая встреча">
+
+        <img src="{% static 'images/slide4.jpg' %}"
+             class="slider-image absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-700"
+             alt="Помещение для конференции">
+
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900/55 via-slate-900/10 to-transparent"></div>
+
+        <div class="absolute left-5 bottom-5 text-white text-left">
+            <h2 class="text-lg md:text-3xl font-bold mb-1 text-wrap">
+                Помещения для мероприятий
+            </h2>
+            <p class="text-sm md:text-base text-white/85">
+                Конференции, встречи и деловые события
+            </p>
+        </div>
+
+        
+        <button type="button"
+                id="prevSlide"
+                class="absolute left-4 top-1/2 -translate-y-1/2 md:w-10 md:h-10 w-5 h-5 rounded-full bg-white/90 shadow flex items-center justify-center text-slate-700 hover:bg-white transition">
+            <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        <button type="button"
+                id="nextSlide"
+                class="absolute right-4 top-1/2 -translate-y-1/2 md:w-10 md:h-10 w-5 h-5 rounded-full bg-white/90 shadow flex items-center justify-center text-slate-700 hover:bg-white transition">
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+
+        <div class="absolute bottom-5 right-5 flex justify-center gap-2">
+            <span class="slider-dot w-2.5 h-2.5 rounded-full bg-white"></span>
+            <span class="slider-dot w-2.5 h-2.5 rounded-full bg-white/50"></span>
+            <span class="slider-dot w-2.5 h-2.5 rounded-full bg-white/50"></span>
+            <span class="slider-dot w-2.5 h-2.5 rounded-full bg-white/50"></span>
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+    const slides = document.querySelectorAll('.slider-image');
+    const dots = document.querySelectorAll('.slider-dot');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+
+    let currentSlide = 0;
+
+    function showSlide(index) {
+        slides.forEach(function (slide, i) {
+            slide.classList.toggle('opacity-100', i === index);
+            slide.classList.toggle('opacity-0', i !== index);
+        });
+
+        dots.forEach(function (dot, i) {
+            dot.classList.toggle('bg-white', i === index);
+            dot.classList.toggle('bg-white/50', i !== index);
+        });
+    }
+
+    function nextSlide() {
+        currentSlide++;
+
+        if (currentSlide >= slides.length) {
+            currentSlide = 0;
+        }
+
+        showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+        currentSlide--;
+
+        if (currentSlide < 0) {
+            currentSlide = slides.length - 1;
+        }
+
+        showSlide(currentSlide);
+    }
+
+    if (nextBtn && prevBtn) {
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+    }
+
+    setInterval(nextSlide, 3000);
+</script>
+
+{% endblock %}
